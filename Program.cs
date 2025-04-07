@@ -1,8 +1,9 @@
-var builder = WebApplication.CreateBuilder(args);
+using Budget_Management.Services;
 
+var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-
+builder.Services.AddTransient<IAccountTypeRepository, AccountTypeRepository>(); 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

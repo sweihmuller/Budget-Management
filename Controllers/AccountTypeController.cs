@@ -1,13 +1,18 @@
 ﻿using Budget_Management.Models;
+using Budget_Management.Services;
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 
 namespace Budget_Management.Controllers
 {
-    public class AccountTypeController(IConfiguration configuration) : Controller
+    public class AccountTypeController : Controller
     {
-        private readonly string connectionString = configuration.GetConnectionString("DefaultConnection");
+        private readonly IAccountTypeRepository _accountTypeRepository;
+        public AccountTypeController(IAccountTypeRepository accountTypeRepository)
+        {
+            _accountTypeRepository = accountTypeRepository;
+        }
 
         [HttpGet]
         public IActionResult Create()
@@ -23,6 +28,10 @@ namespace Budget_Management.Controllers
                 // Save the account type to the database}
                 return View(accountType);
             }
+
+            accountType.userId = 1;
+            _accountTypeRepository.Create(accountType);
+
             return View();
         }
     }
