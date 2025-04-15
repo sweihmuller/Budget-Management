@@ -7,6 +7,7 @@ namespace Budget_Management.Services
     public interface IAccountTypeRepository
     {
         Task Create(AccountType accountType);
+        Task<bool> DoesExist(string name, int userId);
     }
     public class AccountTypeRepository : IAccountTypeRepository
     {
@@ -21,8 +22,20 @@ namespace Budget_Management.Services
                 var id = await connection.QuerySingleAsync<int>($@"INSERT INTO AccountType (name, userId, [order])
                                                         VAlUES (@name, @userId, 0)
                                                         SELECT SCOPE_IDENTITY();", accountType);
-                accountType.Id = id;    
+                accountType.Id = id;
             }
-        }   
+        }
+
+        public async Task<bool> DoesExist(string name, int userId)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var exists = await connection.QueryFirstOrDefaultAsync<int>($@"SELECT COUNT(*) 
+                                                                               FROM AccountType 
+                                                                               WHERE name = @name AND userId = @userId", 
+                                                                               new { name, userId });
+                return exists > 0;
+            }
+        }
     }
 }

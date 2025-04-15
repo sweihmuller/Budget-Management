@@ -29,8 +29,14 @@ namespace Budget_Management.Controllers
                 return View(accountType);
             }*/
 
-            accountType.userId = 1;
-           await _accountTypeRepository.Create(accountType);
+           accountType.userId = 1;
+           var doesAlreadyExist = await _accountTypeRepository.DoesExist(accountType.name, accountType.userId);
+            if(doesAlreadyExist)
+            {
+                ModelState.AddModelError(nameof(accountType.name), $"El nombre {accountType.name} ya existe.");
+                return View(accountType);
+            }
+            await _accountTypeRepository.Create(accountType);
 
             return View();
         }
