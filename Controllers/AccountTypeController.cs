@@ -21,16 +21,16 @@ namespace Budget_Management.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(AccountType accountType)
+        public async Task<IActionResult> Create(AccountType accountType)
         {
-            if (!ModelState.IsValid)
+           /* if (!ModelState.IsValid)
             {
                 // Save the account type to the database}
                 return View(accountType);
-            }
+            }*/
 
             accountType.userId = 1;
-            _accountTypeRepository.Create(accountType);
+           await _accountTypeRepository.Create(accountType);
 
             return View();
         }
