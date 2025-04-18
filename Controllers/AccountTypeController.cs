@@ -14,6 +14,13 @@ namespace Budget_Management.Controllers
             _accountTypeRepository = accountTypeRepository;
         }
 
+        public async Task<IActionResult> Index()
+        {
+            var userId = 1;
+            var accountType = await _accountTypeRepository.Retrieve(userId);
+            return View(accountType);
+        }
+
         [HttpGet]
         public IActionResult Create()
         {
@@ -38,7 +45,7 @@ namespace Budget_Management.Controllers
             }
             await _accountTypeRepository.Create(accountType);
 
-            return View();
+            return RedirectToActionPermanent("Index");
         }
     }
 }
