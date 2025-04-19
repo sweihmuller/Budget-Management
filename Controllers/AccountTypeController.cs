@@ -78,5 +78,29 @@ namespace Budget_Management.Controllers
 
             return RedirectToActionPermanent("Index");
         }
+
+        public async Task<IActionResult> Delete(int id)
+        {
+            var userId = _userServices.RetrieveUserId();
+            var accountType = await _accountTypeRepository.RetrieveById(id, userId);
+            if (accountType is null)
+            {
+                return RedirectToAction("NotFound", "Home");
+            }
+            return View(accountType);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteAccountType(AccountType accountType)
+        {
+            var userId = _userServices.RetrieveUserId();
+            var doesAlreadyExist = await _accountTypeRepository.RetrieveById(accountType.Id, userId);
+            if (doesAlreadyExist is null)
+            {
+                return RedirectToAction("NotFound", "Home");
+            }
+            await _accountTypeRepository.Delete(accountType.Id);
+            return RedirectToAction("Index");
+        }
     }
 }

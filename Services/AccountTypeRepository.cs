@@ -7,6 +7,7 @@ namespace Budget_Management.Services
     public interface IAccountTypeRepository
     {
         Task Create(AccountType accountType);
+        Task Delete(int id);
         Task<bool> DoesExist(string name, int userId);
         Task<IEnumerable<AccountType>> Retrieve(int userId);
         Task<AccountType> RetrieveById(int id, int userId);
@@ -66,8 +67,17 @@ namespace Budget_Management.Services
             {
                 return await connection.QueryFirstOrDefaultAsync<AccountType>($@"SELECT [Id], [name], [userId], [order]
                                                                                  FROM AccountType
-                                                                                 WHERE Id = @Id AND userId = @userId", 
+                                                                                 WHERE Id = @Id AND userId = @userId",
                                                                                  new { id, userId });
+            }
+        }
+
+        public async Task Delete(int id)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.ExecuteAsync($@"DELETE FROM AccountType
+                                                WHERE Id = @Id", new { id });
             }
         }
     }

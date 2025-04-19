@@ -4,13 +4,14 @@ namespace Budget_Management.Validaciones
 {
     public class IsFirstLetterCapitalAttribute : ValidationAttribute
     {
-        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        protected override ValidationResult? IsValid(object? value,
+                                                     ValidationContext validationContext)
         {
-            if (string.IsNullOrEmpty(value.ToString()) || value == null)
+            if (value == null || string.IsNullOrEmpty(value.ToString()))
             {
                 return ValidationResult.Success;
             }
-            if (char.IsLower(value.ToString()[0]))
+            if (char.IsLower(value.ToString()![0]))
             {
                 return new ValidationResult("La primera letra debe ser mayúscula");
             }
