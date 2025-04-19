@@ -1,0 +1,19 @@
+﻿@model AccountType
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "Editar tipo cuenta";
+}
+
+<h1>Editar tipo de cuenta: @Model.name</h1>
+<form asp-controller="AccountType" asp-action="Edit">
+    <input type="hidden" asp-for="Id" />
+    <div class="mb-3">
+        <label for="name" class="form-label">Nombre</label>
+        <input type="text" asp-for="name" class="form-control" />
+        <span asp-validation-for="name" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Enviar</button>
+    <a class="btn btn-secondary" asp-action="Index">Cancelar</a>
+</form>
