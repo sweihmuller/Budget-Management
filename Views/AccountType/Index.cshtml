@@ -14,7 +14,7 @@
             <th>Nombre</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody id="reordenable">
         @foreach(var accountType in Model)
         {
             <tr>
@@ -29,3 +29,26 @@
         }
     </tbody>
 </table>
+
+@section Scripts {
+    <script>
+        $(function () {
+            $("#reordenable").sortable({
+                update: function (event, ui) {
+                    var order = $(this).sortable("toArray");
+                    $.ajax({
+                        url: '@Url.Action("Reorder", "AccountType")',
+                        type: 'POST',
+                        data: { order: order },
+                        success: function (response) {
+                            console.log("Orden actualizado");
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("Error al actualizar el orden:", error);
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}
