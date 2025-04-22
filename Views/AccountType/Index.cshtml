@@ -19,6 +19,7 @@
         {
             <tr>
                 <td>
+                    <input type="hidden" value="@accountType.Id" class="ids" />
                     <a class="btn btn-primary" asp-action="Edit" asp-route-id="@accountType.Id">Editar</a>
                     <a class="btn btn-danger" asp-action="Delete" asp-route-id="@accountType.Id">Borrar</a>
                 </td>
@@ -32,23 +33,40 @@
 
 @section Scripts {
     <script>
+        const rearrangingURL = '@Url.Action("Rearranging", "AccountType")';
+
         $(function () {
-            $("#reordenable").sortable({
-                update: function (event, ui) {
-                    var order = $(this).sortable("toArray");
-                    $.ajax({
-                        url: '@Url.Action("Reorder", "AccountType")',
-                        type: 'POST',
-                        data: { order: order },
-                        success: function (response) {
-                            console.log("Orden actualizado");
-                        },
-                        error: function (xhr, status, error) {
-                            console.error("Error al actualizar el orden:", error);
-                        }
-                    });
+            $('#reordenable').sortable({
+                stop: async function (e, ui) {
+                    await updateOrders();
                 }
             });
+
+            async function updateOrders() {
+                const ids = retrieveElementsIds();
+                await sendIdsToBackend(ids);
+            }
+
+            function retrieveElementsIds() {
+                const ids = $('.ids').map(function () {
+                    return $(this).val();
+                }).get();
+                return ids;
+            }
+
+            async function sendIdsToBackend(ids) {
+                const response = await fetch(rearrangingURL, {
+                    method: 'POST',
+                    body: JSON.stringify(ids),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    console.error('Error al enviar los IDs al backend');
+                }
+            }
         });
     </script>
 }

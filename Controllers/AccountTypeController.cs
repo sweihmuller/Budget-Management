@@ -1,4 +1,5 @@
-﻿using Budget_Management.Models;
+﻿using System.Text.RegularExpressions;
+using Budget_Management.Models;
 using Budget_Management.Services;
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
@@ -102,5 +103,27 @@ namespace Budget_Management.Controllers
             await _accountTypeRepository.Delete(accountType.Id);
             return RedirectToAction("Index");
         }
+
+        public async Task<IActionResult> Rearranging([FromBody] int[] ids) {
+            var userId = _userServices.RetrieveUserId();
+            var accountTypes = await _accountTypeRepository.Retrieve(userId);
+
+            var accountTypesId = accountTypes.Select(x => x.Id);
+            var idsToRearrange = ids.Except(accountTypesId).ToList();
+            if (idsToRearrange.Count > 0)
+            {
+                return Forbid();
+            }
+
+            var accountTypesToRearrange = ids.Select((value, index) =>
+            
+                new AccountType()
+                {
+                    Id = value,
+                    order = index + 1
+                }).AsEnumerable();
+            await _accountTypeRepository.Rearrange(accountTypesToRearrange);
+            return Ok();
+        } 
     }
 }

@@ -9,6 +9,7 @@ namespace Budget_Management.Services
         Task Create(AccountType accountType);
         Task Delete(int id);
         Task<bool> DoesExist(string name, int userId);
+        Task Rearrange(IEnumerable<AccountType> accountTypes);
         Task<IEnumerable<AccountType>> Retrieve(int userId);
         Task<AccountType> RetrieveById(int id, int userId);
         Task Update(AccountType accountType);
@@ -23,9 +24,11 @@ namespace Budget_Management.Services
         {
             using (var connection = new SqlConnection(_connectionString))
             {
-                var id = await connection.QuerySingleAsync<int>($@"INSERT INTO AccountType (name, userId, [order])
-                                                        VAlUES (@name, @userId, 0)
-                                                        SELECT SCOPE_IDENTITY();", accountType);
+                var id = await connection.QuerySingleAsync<int>("AccountTypes_Insert", new
+                {
+                    Name = accountType.name,
+                    UserId = accountType.userId
+                }, commandType: System.Data.CommandType.StoredProcedure);
                 accountType.Id = id;
             }
         }
@@ -48,7 +51,8 @@ namespace Budget_Management.Services
             {
                 return await connection.QueryAsync<AccountType>(@$"SELECT[Id],[name], [userId], [order]
                                                                  FROM [BudgetManagement].[dbo].[accountType]
-                                                                 WHERE userId = @userId;", new { userId });
+                                                                 WHERE userId = @userId
+                                                                 ORDER BY [order];", new { userId });
             }
         }
 
@@ -78,6 +82,16 @@ namespace Budget_Management.Services
             {
                 await connection.ExecuteAsync($@"DELETE FROM AccountType
                                                 WHERE Id = @Id", new { id });
+            }
+        }
+
+        public async Task Rearrange(IEnumerable<AccountType> accountTypes)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.ExecuteAsync($@"UPDATE AccountType
+                                                SET [order] = @order
+                                                WHERE Id = @Id", accountTypes);
             }
         }
     }
