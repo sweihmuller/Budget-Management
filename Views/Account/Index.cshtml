@@ -55,7 +55,7 @@
     @foreach(var accountTypes in Model)
     {
         <div class="accordion-item">
-            <h2 class="accordion-header" id="headerOne">
+            <h2 class="accordion-header" id="head erOne">
                 @{
                     var id = accountTypes.AccountType.Replace(" ", "");
                     var dataBsTarget = $"#{id}";
@@ -74,7 +74,15 @@
                         @foreach(var account in accountTypes.Accounts)
                         {
                             <li class="list-group-item">
-                                <span><strong>@account.Name</strong></span>
+                                <span>
+                                    <strong>@account.Name</strong>
+                                    <a class="btn btn-primary">
+                                        <i class="bi-pencil-fill"></i>
+                                    </a>
+                                    <a class="btn btn-danger">
+                                        <i class="bi-trash-fill"></i>
+                                    </a>
+                                </span>
                                 <span class="total @RetrieveBalanceClass(account.Balance)">
                                     @FormatBalance(account.Balance)
                                 </span>

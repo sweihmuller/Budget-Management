@@ -24,8 +24,9 @@
 }
 
 .accordion-accounts button > span {
-    display: flex;
-    justify-content: space-between;
+   display: flex;
+   justify-content: space-between;
+   width: 100%;
 }
 
 .accordion-accounts ul li {
