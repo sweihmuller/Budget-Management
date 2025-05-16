@@ -1,4 +1,5 @@
-﻿using Budget_Management.Models;
+﻿using AutoMapper;
+using Budget_Management.Models;
 using Budget_Management.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -10,14 +11,17 @@ namespace Budget_Management.Controllers
         private readonly IAccountTypeRepository _accountTypeRepository;
         private readonly IUserServices _userServices;
         private readonly IAccountRepository _accountRepository;
+        private readonly IMapper _iMapper;
 
         public AccountController(IAccountTypeRepository accountTypeRepository, 
                                  IUserServices userServices,
-                                 IAccountRepository accountRepository)
+                                 IAccountRepository accountRepository,
+                                 IMapper mapper)
         {
             _accountTypeRepository = accountTypeRepository;
             _userServices = userServices;
             _accountRepository = accountRepository;
+            _iMapper = mapper;
         }
 
         public async Task<IActionResult> Index()
@@ -71,14 +75,7 @@ namespace Budget_Management.Controllers
                 return RedirectToAction("NotFound", "Home");
             }
 
-            var model = new CreationAccountViewModel()
-            {
-                Id = account.Id,
-                Name = account.Name,
-                AccountTypeId = account.AccountTypeId,
-                Description = account.Description,
-                Balance = account.Balance,
-            };
+            var model = _iMapper.Map<CreationAccountViewModel>(account);
 
             model.AccountType = await GetAccountTypes(userId);
             return View(model);

@@ -6,6 +6,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<IAccountTypeRepository, AccountTypeRepository>();
 builder.Services.AddTransient<IUserServices, UserServices>();
 builder.Services.AddTransient<IAccountRepository, AccountRepository>();
+builder.Services.AddAutoMapper(typeof(Program)); 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
