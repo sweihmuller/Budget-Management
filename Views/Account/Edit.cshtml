@@ -1,15 +1,14 @@
 ﻿@model CreationAccountViewModel
+
 @{
-    ViewData["Title"] = "Crear cuenta";
+    ViewData["Title"] = "Editar cuenta";
 }
 
-<h1>Crear cuenta</h1>
-<h5>La cuenta se refiere a los distintos balances que tienes: 
-    tarjeta de crédito, cuenta de ahorro, préstamo, etc.
-</h5>
+<h1>Editar cuenta: @Model.Name</h1>
 
-<form asp-action="create">
+<form asp-action="edit">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="Id" />
     <div class="mb-3">
         <label asp-for="Name" class="control-label"></label>
         <input asp-for="Name" class="form-control" />
@@ -22,12 +21,12 @@
     </div>
     <div class="mb-3">
         <label asp-for="Balance" class="form-label"></label>
-        <input asp-for="Balance" class="form-select" asp-items="Model.AccountType">
+        <input asp-for="Balance" class="form-select" asp-items="Model.AccountType"></input>
         <span asp-validation-for="Balance" class="text-danger"></span>
     </div>
     <div class="mb-3">
         <label asp-for="Description" class="form-label"></label>
-        <input asp-for="Description" class="form-select" asp-items="Model.AccountType">
+        <input asp-for="Description" class="form-select" asp-items="Model.AccountType"></input>
         <span asp-validation-for="Description" class="text-danger"></span>
     </div>
 

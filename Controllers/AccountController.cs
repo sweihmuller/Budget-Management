@@ -60,5 +60,56 @@ namespace Budget_Management.Controllers
             await _accountRepository.Create(account);
              return RedirectToAction("Index");
         }
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var userId = _userServices.RetrieveUserId();
+            var account = await _accountRepository.GetById(id, userId);
+
+            if (account is null)
+            {
+                return RedirectToAction("NotFound", "Home");
+            }
+
+            var model = new CreationAccountViewModel()
+            {
+                Id = account.Id,
+                Name = account.Name,
+                AccountTypeId = account.AccountTypeId,
+                Description = account.Description,
+                Balance = account.Balance,
+            };
+
+            model.AccountType = await GetAccountTypes(userId);
+            return View(model);
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(CreationAccountViewModel creationAccountViewModel)
+        {
+            var userId = _userServices.RetrieveUserId();
+            var account = await _accountRepository.GetById(creationAccountViewModel.Id, userId);
+
+            if (account is null)
+            {
+                return RedirectToAction("NotFound", "Home");
+            }
+
+            var accountType = await _accountTypeRepository.RetrieveById(creationAccountViewModel.Id, userId);
+            if(accountType is null)
+            {
+                return RedirectToAction("NotFound", "Home");
+            }
+
+            await _accountRepository.Update(creationAccountViewModel);
+            return RedirectToAction("Index");
+        }
+
+        private async Task<IEnumerable<SelectListItem>> GetAccountTypes(int userId)
+        {
+            var accountType = await _accountTypeRepository.Retrieve(userId);
+            return accountType.Select(x => new SelectListItem(x.name, x.Id.ToString()));
+        }
     }
 }
