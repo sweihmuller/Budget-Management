@@ -8,6 +8,7 @@ namespace Budget_Management.Services
     public interface IAccountRepository
     {
         Task Create(Account account);
+        Task Delete(int id);
         Task<Account> GetById(int id, int userId);
         Task<IEnumerable<Account>> Search(int userId);
         Task Update(CreationAccountViewModel creationAccountViewModel);
@@ -63,6 +64,14 @@ namespace Budget_Management.Services
                 await connection.ExecuteAsync(@"UPDATE account 
                                                 SET [name] = @Name, [accountTypeId] = @AccountTypeId, [balance] = @Balance, [description] = @Description 
                                                 WHERE Id = @Id", creationAccountViewModel);
+            }
+        }
+
+        public async Task Delete(int id)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                await connection.ExecuteAsync(@"DELETE FROM account WHERE Id = @Id", new { id });
             }
         }
 

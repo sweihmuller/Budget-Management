@@ -13,7 +13,7 @@ namespace Budget_Management.Controllers
         private readonly IAccountRepository _accountRepository;
         private readonly IMapper _iMapper;
 
-        public AccountController(IAccountTypeRepository accountTypeRepository, 
+        public AccountController(IAccountTypeRepository accountTypeRepository,
                                  IUserServices userServices,
                                  IAccountRepository accountRepository,
                                  IMapper mapper)
@@ -62,7 +62,7 @@ namespace Budget_Management.Controllers
             }
 
             await _accountRepository.Create(account);
-             return RedirectToAction("Index");
+            return RedirectToAction("Index");
         }
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
@@ -94,7 +94,7 @@ namespace Budget_Management.Controllers
             }
 
             var accountType = await _accountTypeRepository.RetrieveById(creationAccountViewModel.Id, userId);
-            if(accountType is null)
+            if (accountType is null)
             {
                 return RedirectToAction("NotFound", "Home");
             }
@@ -107,6 +107,35 @@ namespace Budget_Management.Controllers
         {
             var accountType = await _accountTypeRepository.Retrieve(userId);
             return accountType.Select(x => new SelectListItem(x.name, x.Id.ToString()));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var userId = _userServices.RetrieveUserId();
+            var account = await _accountRepository.GetById(id, userId);
+
+            if (account is null)
+            {
+                return RedirectToAction("NotFound", "Home");
+            }
+
+            return View(account);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteAccount(int id)
+        {
+            var userId = _userServices.RetrieveUserId();
+            var account = await _accountRepository.GetById(id, userId);
+
+            if(account is null)
+            {
+                return RedirectToAction("NotFound", "Home");
+            }
+
+            await _accountRepository.Delete(id);
+            return RedirectToAction("Index");
         }
     }
 }
