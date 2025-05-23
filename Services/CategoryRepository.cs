@@ -7,6 +7,7 @@ namespace Budget_Management.Services
     public interface ICategoryRepository
     {
         Task Create(Category category);
+        Task<IEnumerable<Category>> GetAll(int userId);
     }
     public class CategoryRepository : ICategoryRepository
     {
@@ -24,6 +25,15 @@ namespace Budget_Management.Services
                                                    "VALUES (@Name, @OperationTypeId, @UserId);" +
                                                    "SELECT SCOPE_IDENTITY();", category);
                 category.Id = id;
+            }
+        }
+
+        public async Task<IEnumerable<Category>> GetAll(int userId)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                return await connection.QueryAsync<Category>(@"SELECT * FROM category WHERE userId = @userId", new {userId });
+               
             }
         }
     }

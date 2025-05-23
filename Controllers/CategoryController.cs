@@ -30,5 +30,13 @@ namespace Budget_Management.Controllers
             await _categoryRepository.Create(category);
             return RedirectToAction("Index", "Home");
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Index()
+        {
+            var userId = _userServices.RetrieveUserId();
+            var categories = await _categoryRepository.GetAll(userId);
+            return View(categories);
+        }
     }
 }
