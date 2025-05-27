@@ -16,12 +16,20 @@ namespace Budget_Management.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> Index()
+        {
+            var userId = _userServices.RetrieveUserId();
+            var categories = await _categoryRepository.GetAll(userId);
+            return View(categories);
+        }
+
+        [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
-        [HttpPost] 
+        [HttpPost]
         public async Task<IActionResult> Create(Category category)
         {
             var userId = _userServices.RetrieveUserId();
@@ -32,11 +40,32 @@ namespace Budget_Management.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Update(int id)
         {
             var userId = _userServices.RetrieveUserId();
-            var categories = await _categoryRepository.GetAll(userId);
-            return View(categories);
+            var category = await _categoryRepository.GetById(id, userId);
+            if (category is null)
+            {
+                return RedirectToAction("NotFound", "Home");
+            }
+
+            return View(category);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Update(Category category)
+        {
+            var userId = _userServices.RetrieveUserId();
+            var retrievedCategory = await _categoryRepository.GetById(category.Id, userId);
+
+            if (category is null)
+            {
+                return RedirectToAction("NotFound", "Index");
+            }
+
+            category.userId = userId;
+            await _categoryRepository.Update(category);
+            return RedirectToAction("Index", "Home");
         }
     }
 }

@@ -7,7 +7,10 @@ namespace Budget_Management.Services
     public interface ICategoryRepository
     {
         Task Create(Category category);
+        Task Delete(int id);
         Task<IEnumerable<Category>> GetAll(int userId);
+        Task<Category> GetById(int id, int userId);
+        Task Update(Category category);
     }
     public class CategoryRepository : ICategoryRepository
     {
@@ -36,5 +39,26 @@ namespace Budget_Management.Services
                
             }
         }
+
+        public async Task<Category> GetById(int id, int userId)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                return await connection.QueryFirstAsync<Category>(@"SELECT * FROM category 
+                                                                    WHERE Id = @id AND userId = @userId", new { id, userId });
+            }
+        }
+
+        public async Task Update(Category category)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                await connection.ExecuteAsync(@"UPDATE category
+                                                SET [name] = @Name,
+	                                                [operationTypeId] = @operationTypeId 
+                                                WHERE [Id] = @Id", category);
+            }
+        }
+
     }
 }
