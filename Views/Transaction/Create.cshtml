@@ -1,0 +1,68 @@
+﻿@model TransactionCreationViewModel 
+@{
+    ViewData["Title"] = "Crear transacción";
+}
+
+<h1>Crear transacción</h1>
+
+<form asp-action="Create">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="mb-3">
+        <label asp-for="DateTransaction" class="form-label"></label>
+        <input asp-for="DateTransaction" class="form-control" />
+        <span asp-validation-for="DateTransaction" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="AccountId"></label>
+        <select asp-for="AccountId" class="form-select" asp-items="Model.Account"></select>
+        <span asp-validation-for="AccountId" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="OperationTypeId"></label>
+        <select asp-for="OperationTypeId" class="form-select" asp-items="Html.GetEnumSelectList<OperationType>()"></select>
+        <span asp-validation-for="OperationTypeId" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="CategoryId" class="form-label"></label>
+        <select asp-for="CategoryId" class="form-select"></select>
+        <span asp-validation-for="CategoryId" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Amount" class="form-label"></label>
+        <input asp-for="Amount" class="form-control" />
+        <span asp-validation-for="Amount" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Note" class="form-label"></label>
+        <textarea asp-for="Note" class="form-control"></textarea>
+        <span asp-validation-for="Note" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <button type="submit" class="btn btn-primary">Crear</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        const URLGetCategories = '@Url.Action("GetCategory")';
+
+        $(function() {
+            $("#OperationTypeId").change(async function() {
+                const selectedValue = $(this).val();
+
+                const request = await fetch('GetCategory', {
+                    method: 'POST',
+                    body: selectedValue,
+                    headers: {
+                            'Content-Type': 'application/json'
+                    }
+                });
+
+                const json = await request.json();
+                console.log(json)
+            })
+        })
+    </script>
+}

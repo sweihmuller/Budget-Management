@@ -9,6 +9,7 @@ namespace Budget_Management.Services
         Task Create(Category category);
         Task Delete(int id);
         Task<IEnumerable<Category>> GetAll(int userId);
+        Task<IEnumerable<Category>> GetAll(int userId, OperationType operationType);
         Task<Category> GetById(int id, int userId);
         Task Update(Category category);
     }
@@ -35,7 +36,22 @@ namespace Budget_Management.Services
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                return await connection.QueryAsync<Category>(@"SELECT * FROM category WHERE userId = @userId", new {userId });
+                return await connection.QueryAsync<Category>(@"SELECT * 
+                                                               FROM category 
+                                                               WHERE userId = @userId",
+                                                               new { userId});
+
+            }
+        }
+
+        public async Task<IEnumerable<Category>> GetAll(int userId, OperationType operationType)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                return await connection.QueryAsync<Category>(@"SELECT * 
+                                                               FROM category 
+                                                               WHERE userId = @userId AND operationTypeId = @operationType", 
+                                                               new { userId, operationType });
                
             }
         }
