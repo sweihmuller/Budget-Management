@@ -15,7 +15,7 @@ namespace Budget_Management.Models
         public int CategoryId { get; set; }
         [StringLength(maximumLength: 1000, ErrorMessage = "La nota no puede exceder los {1} caracteres")]
         public string Note { get; set; }
-        [Range(1, maximum: int.MaxValue, ErrorMessage = "Debe seleccionar una categoría")]
+        [Range(1, maximum: int.MaxValue, ErrorMessage = "Debe seleccionar una cuenta")]
         [Display(Name = "Cuenta")]
         public int AccountId { get; set; }
     }

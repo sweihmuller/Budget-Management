@@ -10,13 +10,21 @@ namespace Budget_Management.Controllers
         private IUserServices _userServices;
         private IAccountRepository _accountRepository;
         private ICategoryRepository _categoryRepository;
+        private ITransactionRepository _transactionRepository;
         public TransactionController(IUserServices userServices, 
                                      IAccountRepository accountRepository, 
-                                     ICategoryRepository categoryRepository)
+                                     ICategoryRepository categoryRepository,
+                                     ITransactionRepository transactionRepository)
         {
             _userServices = userServices;
             _accountRepository = accountRepository;
             _categoryRepository = categoryRepository;
+            _transactionRepository = transactionRepository;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            return View();
         }
 
         public async Task<IActionResult> Create()
@@ -26,6 +34,39 @@ namespace Budget_Management.Controllers
             model.Account = await GetAccount(userId);
             model.Category = await GetCategory(userId, model.OperationTypeId);
             return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(TransactionCreationViewModel model)
+        {
+            var userId = _userServices.RetrieveUserId();
+            /*if (!ModelState.IsValid)
+            {
+                model.Account = await GetAccount(userId);
+                model.Category = await GetCategory(userId, model.OperationTypeId);
+                return View(model);
+            }*/
+
+            var account = await _accountRepository.GetById(model.AccountId, userId);
+            if (account is null)
+            {
+                return RedirectToAction("NotFound", "Home");
+            }
+
+            var category = await _categoryRepository.GetById(model.CategoryId, userId);
+            if (category is null)
+            {
+                return RedirectToAction("NotFound", "Home");
+            }
+            model.UserId = userId;
+
+            if (model.OperationTypeId == OperationType.Expense)
+            {
+                model.Amount *= -1;
+            }
+
+            await _transactionRepository.Create(model);
+            return RedirectToAction("Index", "Home");
         }
 
         private async Task<IEnumerable<SelectListItem>> GetAccount(int userId)

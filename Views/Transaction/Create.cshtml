@@ -61,7 +61,9 @@
                 });
 
                 const json = await request.json();
-                console.log(json)
+                const options = 
+                        json.map(category => `<option value=${category.value}>${category.text}</option>`);
+                        $("#CategoryId").html(options.join(''));
             })
         })
     </script>

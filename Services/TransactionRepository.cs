@@ -16,7 +16,7 @@ namespace Budget_Management.Services
         {
             using(SqlConnection connection = new SqlConnection(_connectionString))
             {
-                var id = await connection.QuerySingleAsync<int>("@", 
+                var id = await connection.QuerySingleAsync<int>("Insert_Transaction", 
                 new
                 {
 
