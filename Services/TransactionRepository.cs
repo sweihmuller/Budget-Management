@@ -7,6 +7,8 @@ namespace Budget_Management.Services
     public interface ITransactionRepository
     {
         Task Create(Transaction transaction);
+        Task Delete(int id);
+        Task<Transaction> GetById(int id, int userId);
     }
     public class TransactionRepository(IConfiguration configuration) : ITransactionRepository
     {
@@ -14,24 +16,47 @@ namespace Budget_Management.Services
 
         public async Task Create(Transaction transaction)
         {
-            using(SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                var id = await connection.QuerySingleAsync<int>("Insert_Transaction", 
+                var id = await connection.QuerySingleAsync<int>("Insert_Transaction",
                 new
                 {
 
                     transaction.UserId,
-                    transaction.DateTransaction ,
+                    transaction.DateTransaction,
                     transaction.Amount,
                     transaction.CategoryId,
                     transaction.Note,
                     transaction.AccountId
                 },
                 commandType: System.Data.CommandType.StoredProcedure);
-               
-               transaction.Id = id;
+
+                transaction.Id = id;
             }
 
+        }
+
+        public async Task<Transaction> GetById(int id, int userId)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                return await connection.QuerySingleOrDefaultAsync<Transaction>(
+                        @"SELECT * 
+                        FROM transactions
+                        INNER JOIN category cat
+                        ON cat.Id = transactions.categoryId
+                        WHERE transactions.Id = @Id AND transactions.userId = @userId;"
+                        , new { id, userId});
+            }
+        }
+
+        public async Task Delete(int id)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                await connection.ExecuteAsync("Delete_Transaction",
+                    new { id }, commandType: System.Data.CommandType.StoredProcedure);
+            }
         }
 
     }

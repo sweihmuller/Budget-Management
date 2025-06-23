@@ -87,6 +87,22 @@ namespace Budget_Management.Controllers
             var userId = _userServices.RetrieveUserId();
             var category = await GetCategory(userId, operationType);
             return Ok(category); 
-        }  
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var userId = _userServices.RetrieveUserId();
+            var transaction = await _transactionRepository.GetById(id, userId);
+
+            if (transaction is null)
+            {
+                return RedirectToAction("NotFound", "Home");
+            }
+
+            await _transactionRepository.Delete(transaction.Id);
+            return RedirectToAction("Index");
+        }
+
     }
 }
