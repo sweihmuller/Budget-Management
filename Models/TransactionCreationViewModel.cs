@@ -8,7 +8,5 @@ namespace Budget_Management.Models
     {
         public IEnumerable<SelectListItem> Account { get; set; }
         public IEnumerable<SelectListItem> Category { get; set; }
-        [Display(Name = "Tipo de operación")]
-        public OperationType OperationTypeId { get; set; } = OperationType.Income;
     }
 }

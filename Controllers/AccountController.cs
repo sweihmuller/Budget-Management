@@ -12,15 +12,18 @@ namespace Budget_Management.Controllers
         private readonly IUserServices _userServices;
         private readonly IAccountRepository _accountRepository;
         private readonly IMapper _iMapper;
+        private readonly ITransactionRepository _transactionRepository; 
 
         public AccountController(IAccountTypeRepository accountTypeRepository,
                                  IUserServices userServices,
                                  IAccountRepository accountRepository,
+                                 ITransactionRepository transactionRepository,
                                  IMapper mapper)
         {
             _accountTypeRepository = accountTypeRepository;
             _userServices = userServices;
             _accountRepository = accountRepository;
+            _transactionRepository = transactionRepository;
             _iMapper = mapper;
         }
 
@@ -38,7 +41,65 @@ namespace Budget_Management.Controllers
             return View(model);
         }
 
-        [HttpGet]
+        public async Task<IActionResult> Details(int id, int month, int year) 
+         {
+            var userId = _userServices.RetrieveUserId();
+            var account = await _accountRepository.GetById(id, userId);
+            if (account is null)
+            {
+                return RedirectToAction("NotFound", "Home");
+            }
+
+            DateTime startDate;
+            DateTime endDate;
+
+            if (month == 0 || month > 12 || year < 1900)
+            {
+                var today = DateTime.Today;
+                startDate = new DateTime(today.Year, today.Month, 1);
+
+            } else
+            {
+                startDate = new DateTime(year, month, 1);
+            }
+
+            endDate = startDate.AddMonths(1).AddDays(-1);
+
+            var getTransactionByAccount = new GetTransactionByAccount
+            {
+                AccountId = id,
+                UserId = userId,
+                StartDate = startDate,
+                EndDate = endDate
+            };
+
+            var transactions = await _transactionRepository.GetAccountById(getTransactionByAccount);
+
+            var model = new DetailedReportTransactions();
+            ViewBag.AccountName = account.Name;
+
+            var transactionByDate = transactions.OrderByDescending(x => x.DateTransaction)
+                                                .GroupBy(x => x.DateTransaction)
+                                                .Select(group => new DetailedReportTransactions.GetTransactionByDate()
+                                                {
+                                                    DateTransaction = group.Key,
+                                                    Transactions = group.AsEnumerable()
+                                                });
+
+            model.TransactionsByDate = transactionByDate;
+            model.DateStart = startDate;
+            model.DateEnd = endDate;
+
+            ViewBag.PreviousMonth = startDate.AddMonths(-1).Month;
+            ViewBag.PreviousYear = startDate.AddMonths(-1).Year;
+
+            ViewBag.NextMonth = startDate.AddMonths(1).Month;
+            ViewBag.NextYear = startDate.AddMonths(1).Year;
+
+            return View(model);
+        }
+
+        [HttpGet]  
         public async Task<IActionResult> Create()
         {
             var userId = _userServices.RetrieveUserId();

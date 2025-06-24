@@ -18,5 +18,9 @@ namespace Budget_Management.Models
         [Range(1, maximum: int.MaxValue, ErrorMessage = "Debe seleccionar una cuenta")]
         [Display(Name = "Cuenta")]
         public int AccountId { get; set; }
+        [Display(Name = "Tipo de operación")]
+        public OperationType OperationTypeId { get; set; } = OperationType.Income;
+        public string Account { get; set; }
+        public string Category { get; set; }
     }
 }
