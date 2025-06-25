@@ -1,0 +1,87 @@
+﻿@model DetailedReportTransactions
+
+<h4>
+    <a asp-route-month="@ViewBag.PreviousMonth" asp-route-year="@ViewBag.PreviousYear"
+       class="btn btn-secondary">
+        <i class="bi-chevron-left"></i>
+    </a>
+    @Model.DateStart.ToString("MMMM") - @Model.DateStart.Year
+    <a asp-route-month="@ViewBag.NextMonth" asp-route-year="@ViewBag.NextYear"
+       class="btn btn-secondary">
+        <i class="bi-chevron-right"></i>
+    </a>
+</h4>
+
+<div class="contenedor-totales mb-3">
+    <div>
+        <div>
+            <strong>Depósitos</strong>
+        </div>
+        <div class="activo">
+            @Model.DepositBalance.ToString("N")
+        </div>
+    </div>
+    <div>
+        <div>
+            <strong>Retiros</strong>
+        </div>
+        <div class="pasivo">
+            @Model.WithdrawalBalance.ToString("N")
+        </div>
+    </div>
+    <div>
+        <div>
+            <strong>Depósitos</strong>
+        </div>
+        <div>
+            @Model.TotalBalance.ToString("N")
+        </div>
+    </div>
+</div>
+
+@if (@Model.TransactionsByDate.Count() == 0)
+{
+    <h5>No hay datos para mostrar.</h5>
+}
+else
+{
+    <table class="table">
+        <tbody>
+            @foreach (var transactionByDate in Model.TransactionsByDate)
+            {
+                <tr style="background-color: lightblue; font-size:26px;">
+                    <td colspan="3">
+                        @transactionByDate.DateTransaction.Day
+                        <span class="badge bg-secondary">
+                            @transactionByDate.DateTransaction.ToString("dddd")
+                        </span>
+                    </td>
+                    <td class="activo">@transactionByDate.DepositBalance.ToString("N")</td>
+                    <td class="pasivo">@transactionByDate.WithdrawalBalance.ToString("N")</td>
+                </tr>
+                @foreach (var transaction in transactionByDate.Transactions)
+                {
+                    <tr>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@transaction.Id">
+                                <i class="bi-pencil"></i>
+                            </a>
+                        </td>
+                        <td>@transaction.Category</td>
+                        <td>@transaction.Account</td>
+                        <td class="activo">
+                            @(transaction.OperationTypeId == OperationType.Income
+                                            ? transaction.Amount.ToString("N")
+                                            : null)
+                                               </td>
+                                               <td class="pasivo">
+                            @(transaction.OperationTypeId == OperationType.Expense
+                                            ? transaction.Amount.ToString("N")
+                                            : null)
+            </td>
+        </tr>
+                }
+            }
+        </tbody>
+    </table>
+}

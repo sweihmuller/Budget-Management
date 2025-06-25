@@ -10,6 +10,7 @@ namespace Budget_Management.Services
         Task Delete(int id);
         Task<IEnumerable<Transaction>> GetAccountById(GetTransactionByAccount moodel);
         Task<Transaction> GetById(int id, int userId);
+        Task<IEnumerable<Transaction>> GetUserById(GetTransactionByUserParameters model);
     }
     public class TransactionRepository(IConfiguration configuration) : ITransactionRepository
     {
@@ -49,6 +50,21 @@ namespace Budget_Management.Services
                        WHERE t.accountId = @AccountId AND
                              t.userId = @UserId AND
                              dateTransaction BETWEEN @StartDate AND @EndDate", model);
+            }
+        }
+
+        public async Task<IEnumerable<Transaction>> GetUserById(GetTransactionByUserParameters model)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                return await connection.QueryAsync<Transaction>(@"
+                       SELECT t.Id, t.amount, t.dateTransaction, c.[name] as Category, a.[name] as Account, c.operationTypeId
+                       FROM transactions t
+                       INNER JOIN category c ON c.Id = t.categoryId
+                       INNER JOIN account a ON a.id = t.accountId
+                       WHERE t.userId = @UserId AND
+                             dateTransaction BETWEEN @StartDate AND @EndDate
+                       ORDER BY t.dateTransaction DESC", model);
             }
         }
 

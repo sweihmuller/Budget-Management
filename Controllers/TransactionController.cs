@@ -22,9 +22,56 @@ namespace Budget_Management.Controllers
             _transactionRepository = transactionRepository;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int month, int year)
         {
-            return View();
+            var userId = _userServices.RetrieveUserId();
+            
+            DateTime startDate;
+            DateTime endDate;
+
+            if (month == 0 || month > 12 || year < 1900)
+            {
+                var today = DateTime.Today;
+                startDate = new DateTime(today.Year, today.Month, 1);
+
+            }
+            else
+            {
+                startDate = new DateTime(year, month, 1);
+            }
+
+            endDate = startDate.AddMonths(1).AddDays(-1);
+
+            var parameter = new GetTransactionByUserParameters()
+            {
+                UserId = userId,
+                StartDate = startDate,
+                EndDate = endDate
+            };
+
+            var transactions = await _transactionRepository.GetUserById(parameter);
+
+            var model = new DetailedReportTransactions(); 
+
+            var transactionByDate = transactions.OrderByDescending(x => x.DateTransaction)
+                                                .GroupBy(x => x.DateTransaction)
+                                                .Select(group => new DetailedReportTransactions.GetTransactionByDate()
+                                                {
+                                                    DateTransaction = group.Key,
+                                                    Transactions = group.AsEnumerable()
+                                                });
+
+            model.TransactionsByDate = transactionByDate;
+            model.DateStart = startDate;
+            model.DateEnd = endDate;
+
+            ViewBag.PreviousMonth = startDate.AddMonths(-1).Month;
+            ViewBag.PreviousYear = startDate.AddMonths(-1).Year;
+
+            ViewBag.NextMonth = startDate.AddMonths(1).Month;
+            ViewBag.NextYear = startDate.AddMonths(1).Year;
+
+            return View(model);
         }
 
         public async Task<IActionResult> Create()

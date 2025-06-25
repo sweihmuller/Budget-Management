@@ -1,5 +1,13 @@
-﻿@{
-    ViewData["Title"] = "Indíce de transacciones";
+﻿@model DetailedReportTransactions
+@{
+    ViewData["Title"] = "Reporte diario";
 }
 
-<h1>Indíce de transacciones</h1>
+@if (Model != null)
+{
+    <partial name="_DetailedTransactionReport" model="Model" />
+}
+else
+{
+    <p>No hay datos para mostrar en el reporte.</p>
+}
